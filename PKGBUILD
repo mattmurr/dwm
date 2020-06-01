@@ -11,18 +11,37 @@ url="http://dwm.suckless.org"
 arch=('i686' 'x86_64')
 license=('MIT')
 options=(zipman)
-depends=('libx11' 'libxinerama' 'libxft' 'freetype2' 'st' 'dmenu')
+depends=('libx11' 'libxinerama' 'libxft' 'freetype2')
 install=dwm.install
 source=(http://dl.suckless.org/dwm/dwm-$pkgver.tar.gz
+	dwm-attachbottom-6.2.diff
+	dwm-push_no_master-6.2.diff
+	dwm-uselessgap-6.2.diff
+  enable-color-fonts.diff
 	config.h
 	dwm.desktop)
 sha256sums=('97902e2e007aaeaa3c6e3bed1f81785b817b7413947f1db1d3b62b8da4cd110e'
-            'ce156c4ff6be6f664f5c1eb41e8ae8228c15d0282410be3ecdd58598bb8867d2'
+            '8a05d45f13a5852790f45a26a9c814b7ac28a917be8d3252b66970a39f68611e'
+            '1398b82ebb891e5c47a91a023be66d08c92d1355fe5a6614bda570fea6b46e4f'
+            '5667251372a5f3e8f297a2b458637ead9627f608b8e86e7a517baf791106a237'
+            '3bac812c74bfd71e7ee6536da5a369d31095d13de957a57a4702c3b3f2776744'
+            '2e5596e1024e76fc52729e30866a4d8ef965a66b3c5f0c024bce60f40281b1fc'
             'bc36426772e1471d6dd8c8aed91f288e16949e3463a9933fee6390ee0ccd3f81')
 
 prepare() {
   cd "$srcdir/$pkgname-$pkgver"
+  # Copy the config.h into the build directory
   cp "$srcdir/config.h" config.h
+
+  # Apply the patches
+  local src
+  for src in "${source[@]}"; do
+    src="${src%%::*}"
+    src="${src##*/}"
+    [[ $src = *.diff ]] || continue
+    echo "Applying patch $src..."
+    patch -Np1 < "../$src"
+  done
 }
 
 build() {
